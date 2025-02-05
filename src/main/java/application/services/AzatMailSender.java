@@ -1,4 +1,4 @@
-package application.configurations;
+package application.services;
 
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
@@ -25,7 +25,6 @@ public class AzatMailSender {
     public void sendSimpleEmail(String toAddress, String subject, String messageBody) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            message.setFrom(new InternetAddress("kot514877@gmail.com"));
             message.setRecipients(MimeMessage.RecipientType.TO, InternetAddress.parse(toAddress));
             message.setSubject(subject);
             message.setText(messageBody, "UTF-8");
@@ -38,7 +37,6 @@ public class AzatMailSender {
     public void sendHtmlEmail(String toAddress, String subject, String htmlContent) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            //message.setFrom(new InternetAddress("kot514877@gmail.com"));
             message.setRecipients(MimeMessage.RecipientType.TO, InternetAddress.parse(toAddress));
             message.setSubject(subject);
             message.setContent(htmlContent, "text/html; charset=UTF-8");
@@ -55,17 +53,16 @@ public class AzatMailSender {
             message.setSubject(subject);
             message.setRecipients(MimeMessage.RecipientType.TO, toAddress);
 
-            // Создаем HTML-часть
+
             MimeBodyPart htmlPart = new MimeBodyPart();
             htmlPart.setContent(htmlContent, "text/html; charset=UTF-8");
 
-            // Создаем вложение (изображение)
+
             MimeBodyPart attachmentPart = new MimeBodyPart();
             DataSource source = new FileDataSource(attachment);
             attachmentPart.setDataHandler(new DataHandler(source));
             attachmentPart.setFileName(attachment.getName());
 
-            // Объединяем в Multipart
             MimeMultipart multipart = new MimeMultipart();
             multipart.addBodyPart(htmlPart);
             multipart.addBodyPart(attachmentPart);
