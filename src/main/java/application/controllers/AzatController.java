@@ -1,7 +1,7 @@
 package application.controllers;
 
 
-import application.PicturesContainer.PicturesHolder;
+import application.picturesContainer.PicturesHolder;
 import application.services.AzatMailSender;
 import application.repository.RedisRepository;
 import application.services.FileService;
@@ -12,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;

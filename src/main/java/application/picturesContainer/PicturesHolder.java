@@ -1,7 +1,6 @@
-package application.PicturesContainer;
+package application.picturesContainer;
 
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
