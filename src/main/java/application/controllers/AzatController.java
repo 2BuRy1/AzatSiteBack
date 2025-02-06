@@ -7,14 +7,22 @@ import application.repository.RedisRepository;
 import application.services.FileService;
 import application.services.JwtConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -59,7 +67,7 @@ public class AzatController {
 
             redisRepository.saveImage(name, multipartFile.getBytes(), 12);
 
-            picturesHolder.addPicture(name, multipartFile.getOriginalFilename());
+            picturesHolder.addPictureToCash(name, multipartFile.getOriginalFilename());
 
             fileService.createFile(multipartFile.getOriginalFilename(), multipartFile.getBytes());
 
@@ -120,7 +128,7 @@ public class AzatController {
                     </html>
                     """, fileService.getFileByName(multipartFile.getOriginalFilename()));
             //TODO нагенерить токен + вставить его в ссылочку
-            fileService.removeFileByName(multipartFile.getOriginalFilename());
+            //fileService.removeFileByName(multipartFile.getOriginalFilename());
 
             return ResponseEntity.ok("added 4 verifiation");
 
@@ -132,38 +140,38 @@ public class AzatController {
 
 
     @GetMapping("/name")
-    public ResponseEntity<Map<String, String>> getImage(@RequestParam("name") String name) throws IOException {
-        byte[] array = picturesHolder.getByName(name);
-        HashMap<String, String> result = new HashMap();
-        if (array != null && array.length != 0) {
+    public ResponseEntity<Object> getImage(@RequestParam("data") String name) throws IOException {
+        byte[] array = picturesHolder.getByNameFromCash(name);
 
+        if (array != null && array.length > 0) {
+            ByteArrayResource resource = new ByteArrayResource(array);
 
-            result.put("image", new String(array));
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_JPEG);
+            headers.setContentLength(array.length);
+            headers.setContentDispositionFormData("image", name);
 
-            return ResponseEntity.ok(result);
+            return new ResponseEntity<>(resource, headers, HttpStatus.OK);
         }
-        result.put("error", "no such image");
-        return ResponseEntity.badRequest().body(result);
+
+        return ResponseEntity
+                .badRequest()
+                .body(Collections.singletonMap("error", "No such image"));
     }
 
 
     @PostMapping("/admin")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> adminPannel(@RequestParam("name") String name, @RequestParam("verified") boolean verified) {
-        byte[] array = redisRepository.getData(name);
+        byte[] array = redisRepository.getData(name).getBytes(StandardCharsets.UTF_8);
         if (array != null && array.length != 0) {
 
             if (verified) {
 
 
                 String fileName = picturesHolder.getMultiPartName(name);
-                Path filePath = Path.of(UPLOAD_DIR, fileName);
 
-                try (FileOutputStream fos = new FileOutputStream(filePath.toFile())) {
-                    fos.write(array);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                fileService.createFile(fileName, array);
                 return ResponseEntity.ok("successfully added!");
             }
 

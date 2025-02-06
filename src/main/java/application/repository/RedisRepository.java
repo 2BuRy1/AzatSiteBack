@@ -28,8 +28,8 @@ public class RedisRepository {
     }
 
 
-    public byte[] getData(String key){
-        return (byte[]) redisTemplate.opsForValue().get(key);
+    public String getData(String key){
+        return (String) redisTemplate.opsForValue().get(key);
     }
 
     public List<String> getAllKeys() {
