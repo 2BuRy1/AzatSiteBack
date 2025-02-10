@@ -8,6 +8,9 @@ import application.services.FileService;
 import application.services.JwtConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,9 +21,11 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,7 +63,7 @@ public class AzatController {
     }
 
 
-    @PostMapping("/api")
+    @PostMapping("/endpoint")
     public ResponseEntity<String> startVerify(@RequestPart("image") MultipartFile multipartFile, @RequestPart("name") String name) throws IOException {
 
 
@@ -72,63 +77,63 @@ public class AzatController {
             fileService.createFile(multipartFile.getOriginalFilename(), multipartFile.getBytes());
 
 
-            azatMailSender.sendHtmlEmailWithAttachment("", "Новое фото", """
-                    <!DOCTYPE html>
-                    <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>New Photo Added</title>
-                        <style>
-                            body {
-                                font-family: Arial, sans-serif;
-                                background-color: #f4f4f4;
-                                text-align: center;
-                                padding: 20px;
-                            }
-                            .container {
-                                background: white;
-                                padding: 20px;
-                                border-radius: 10px;
-                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                                display: inline-block;
-                                max-width: 500px;
-                            }
-                            .photo-container {
-                                margin: 20px 0;
-                                text-align: center;
-                            }
-                            .photo-container img {
-                                max-width: 100%;
-                                border-radius: 10px;
-                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                            }
-                            .button {
-                                display: inline-block;
-                                padding: 10px 20px;
-                                font-size: 16px;
-                                color: white;
-                                background-color: #28a745;
-                                text-decoration: none;
-                                border-radius: 5px;
-                                margin-top: 20px;
-                            }
-                            .button:hover {
-                                background-color: #218838;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="container">
-                            <h2>Новая фотография была добавлена!</h2>
-                            <p>Для подтверждения добавления фотографии, пожалуйста, перейдите по ссылке ниже:</p>
-                          <a href="my.itmo.ru">Gavnoo</a>
-                        </div>
-                    </body>
-                    </html>
-                    """, fileService.getFileByName(multipartFile.getOriginalFilename()));
-            //TODO нагенерить токен + вставить его в ссылочку
-            //fileService.removeFileByName(multipartFile.getOriginalFilename());
+//            azatMailSender.sendHtmlEmailWithAttachment("gamemanfullvision@gmail.com", "Новое фото", """
+//                    <!DOCTYPE html>
+//                    <html lang="en">
+//                    <head>
+//                        <meta charset="UTF-8">
+//                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//                        <title>New Photo Added</title>
+//                        <style>
+//                            body {
+//                                font-family: Arial, sans-serif;
+//                                background-color: #f4f4f4;
+//                                text-align: center;
+//                                padding: 20px;
+//                            }
+//                            .container {
+//                                background: white;
+//                                padding: 20px;
+//                                border-radius: 10px;
+//                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+//                                display: inline-block;
+//                                max-width: 500px;
+//                            }
+//                            .photo-container {
+//                                margin: 20px 0;
+//                                text-align: center;
+//                            }
+//                            .photo-container img {
+//                                max-width: 100%;
+//                                border-radius: 10px;
+//                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+//                            }
+//                            .button {
+//                                display: inline-block;
+//                                padding: 10px 20px;
+//                                font-size: 16px;
+//                                color: white;
+//                                background-color: #28a745;
+//                                text-decoration: none;
+//                                border-radius: 5px;
+//                                margin-top: 20px;
+//                            }
+//                            .button:hover {
+//                                background-color: #218838;
+//                            }
+//                        </style>
+//                    </head>
+//                    <body>
+//                        <div class="container">
+//                            <h2>Новая фотография была добавлена!</h2>
+//                            <p>Для подтверждения добавления фотографии, пожалуйста, перейдите по ссылке ниже:</p>
+//                          <a href="my.itmo.ru">Gavnoo</a>
+//                        </div>
+//                    </body>
+//                    </html>
+//                    """, fileService.getFileByName(multipartFile.getOriginalFilename()));
+//            //TODO нагенерить токен + вставить его в ссылочку
+//            //fileService.removeFileByName(multipartFile.getOriginalFilename());
 
             return ResponseEntity.ok("added 4 verifiation");
 
@@ -140,23 +145,23 @@ public class AzatController {
 
 
     @GetMapping("/name")
-    public ResponseEntity<Object> getImage(@RequestParam("data") String name) throws IOException {
-        byte[] array = picturesHolder.getByNameFromCash(name);
+    public ResponseEntity<?> getImage(@RequestParam("data") String name) throws IOException {
+        String filePath = "uploads/" + picturesHolder.getMultiPartName(name);
+        File file = new File(filePath);
 
-        if (array != null && array.length > 0) {
-            ByteArrayResource resource = new ByteArrayResource(array);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG);
-            headers.setContentLength(array.length);
-            headers.setContentDispositionFormData("image", name);
-
-            return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+        if (!file.exists()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Collections.singletonMap("error", "No such image"));
         }
 
-        return ResponseEntity
-                .badRequest()
-                .body(Collections.singletonMap("error", "No such image"));
+        byte[] fileBytes = Files.readAllBytes(file.toPath());
+        ByteArrayResource resource = new ByteArrayResource(fileBytes);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG) // Или IMAGE_PNG
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + name + "\"")
+                .body(resource);
     }
 
 
