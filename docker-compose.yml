@@ -5,12 +5,12 @@ services:
     container_name: my_redis
     restart: always
     ports:
-      - "6379:6379" # Открываем порт Redis для доступа извне
+      - "6379:6379"
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes # Включаем сохранение данных на диск
+    command: redis-server --appendonly yes
 
 volumes:
   redis_data:

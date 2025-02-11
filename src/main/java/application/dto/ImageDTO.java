@@ -1,14 +1,16 @@
 package application.dto;
 
+
+import lombok.Data;
+
+import java.util.Arrays;
+
+
+@Data
 public class ImageDTO {
 
-    private String name;
+    private final String name;
 
-    public String getName() {
-        return name;
-    }
+    private final byte[] image;
 
-    public void setName(String name) {
-        this.name = name;
-    }
 }

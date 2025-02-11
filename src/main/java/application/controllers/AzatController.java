@@ -165,29 +165,29 @@ public class AzatController {
     }
 
 
-    @PostMapping("/admin")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<String> adminPannel(@RequestParam("name") String name, @RequestParam("verified") boolean verified) {
-        byte[] array = redisRepository.getData(name).getBytes(StandardCharsets.UTF_8);
-        if (array != null && array.length != 0) {
-
-            if (verified) {
-
-
-                String fileName = picturesHolder.getMultiPartName(name);
-
-                fileService.createFile(fileName, array);
-                return ResponseEntity.ok("successfully added!");
-            }
-
-            picturesHolder.remove(name);
-            redisRepository.remove(name);
-
-
-        }
-
-        return ResponseEntity.badRequest().body("No such image");
-    }
+//    @PostMapping("/admin")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    public ResponseEntity<String> adminPannel(@RequestParam("name") String name, @RequestParam("verified") boolean verified) {
+//        byte[] array = redisRepository.getData(name).getBytes(StandardCharsets.UTF_8);
+//        if (array != null && array.length != 0) {
+//
+//            if (verified) {
+//
+//
+//                String fileName = picturesHolder.getMultiPartName(name);
+//
+//                fileService.createFile(fileName, array);
+//                return ResponseEntity.ok("successfully added!");
+//            }
+//
+//            picturesHolder.remove(name);
+//            redisRepository.remove(name);
+//
+//
+//        }
+//
+//        return ResponseEntity.badRequest().body("No such image");
+//    }
 
 
 }
