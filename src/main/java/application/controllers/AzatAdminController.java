@@ -1,23 +1,19 @@
 package application.controllers;
 
-
 import application.dto.ImageDTO;
 import application.repository.RedisRepository;
-import io.netty.handler.codec.base64.Base64Encoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,33 +22,34 @@ import java.util.logging.Logger;
 @RequestMapping("/admin")
 public class AzatAdminController {
 
-
-    private final RedisRepository redisTemplate;
+    private final RedisRepository redisRepository;
 
     private final Logger logger;
 
     @Autowired
-    public AzatAdminController(RedisRepository redisTemplate, Logger logger) {
-        this.redisTemplate = redisTemplate;
+    public AzatAdminController(RedisRepository redisRepository, Logger logger) {
+        this.redisRepository = redisRepository;
         this.logger = logger;
     }
 
-    @GetMapping("/getAllImages")
-    public ResponseEntity<Map<String,ArrayList<ImageDTO>>> getAllPictures(){
-        ArrayList<String> keys = (ArrayList<String>) redisTemplate.getAllKeys();
-        ArrayList<ImageDTO> images = new ArrayList<>();
-        for(var e: keys){
-            images.add(new ImageDTO(e, Base64.getEncoder().encode(redisTemplate.getData(e).getBytes())));
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/getAllImages")
+    public ResponseEntity<HashMap<String, ArrayList<ImageDTO>>> getAllPictures(Principal principal) {
+        System.out.println(SecurityContextHolder.getContext().getAuthentication());
+        ArrayList<String> keys = (ArrayList<String>) redisRepository.getAllKeys();
+        ArrayList<ImageDTO> images = new ArrayList<>();
+
+        for (String key : keys) {
+            byte[] imageBytes = redisRepository.getData(key);
+            images.add(new ImageDTO(key, imageBytes));
         }
 
-        logger.log(Level.INFO, String.valueOf(keys.size()));
+        logger.log(Level.INFO, "Количество картинок: " + keys.size());
 
         HashMap<String, ArrayList<ImageDTO>> result = new HashMap<>();
-
         result.put("data", images);
 
         return ResponseEntity.ok(result);
     }
-
 }

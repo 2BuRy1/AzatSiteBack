@@ -7,6 +7,7 @@ import application.repository.RedisRepository;
 import application.services.FileService;
 import application.services.JwtConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -44,6 +45,10 @@ public class AzatController {
     private final RedisRepository redisRepository;
 
 
+
+    @Value("${username}")
+    private String username;
+
     private final Logger logger;
 
     private final AzatMailSender azatMailSender;
@@ -77,63 +82,20 @@ public class AzatController {
             fileService.createFile(multipartFile.getOriginalFilename(), multipartFile.getBytes());
 
 
-//            azatMailSender.sendHtmlEmailWithAttachment("gamemanfullvision@gmail.com", "Новое фото", """
-//                    <!DOCTYPE html>
-//                    <html lang="en">
-//                    <head>
-//                        <meta charset="UTF-8">
-//                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//                        <title>New Photo Added</title>
-//                        <style>
-//                            body {
-//                                font-family: Arial, sans-serif;
-//                                background-color: #f4f4f4;
-//                                text-align: center;
-//                                padding: 20px;
-//                            }
-//                            .container {
-//                                background: white;
-//                                padding: 20px;
-//                                border-radius: 10px;
-//                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-//                                display: inline-block;
-//                                max-width: 500px;
-//                            }
-//                            .photo-container {
-//                                margin: 20px 0;
-//                                text-align: center;
-//                            }
-//                            .photo-container img {
-//                                max-width: 100%;
-//                                border-radius: 10px;
-//                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-//                            }
-//                            .button {
-//                                display: inline-block;
-//                                padding: 10px 20px;
-//                                font-size: 16px;
-//                                color: white;
-//                                background-color: #28a745;
-//                                text-decoration: none;
-//                                border-radius: 5px;
-//                                margin-top: 20px;
-//                            }
-//                            .button:hover {
-//                                background-color: #218838;
-//                            }
-//                        </style>
-//                    </head>
-//                    <body>
-//                        <div class="container">
-//                            <h2>Новая фотография была добавлена!</h2>
-//                            <p>Для подтверждения добавления фотографии, пожалуйста, перейдите по ссылке ниже:</p>
-//                          <a href="my.itmo.ru">Gavnoo</a>
-//                        </div>
-//                    </body>
-//                    </html>
-//                    """, fileService.getFileByName(multipartFile.getOriginalFilename()));
-//            //TODO нагенерить токен + вставить его в ссылочку
-//            //fileService.removeFileByName(multipartFile.getOriginalFilename());
+            azatMailSender.sendHtmlEmailWithAttachment("gamemanfullvision@gmail.com", "Новое фото",
+                    String.format(
+                            "<html>" +
+                                    "<body>" +
+                                    "<h2>Новая фотография была добавлена!</h2>" +
+                                    "<p>Для подтверждения добавления фотографии, пожалуйста, перейдите по ссылке ниже:</p>" +
+                                    "<a href=\"http://localhost:5173/admin?token=%s\">Перейти для подтверждения</a>" +
+                                    "</body>" +
+                                    "</html>",
+                            jwtConfiguration.generateToken(username)),
+                    fileService.getFileByName(multipartFile.getOriginalFilename())
+            );
+            //TODO нагенерить токен + вставить его в ссылочку
+              fileService.removeFileByName(multipartFile.getOriginalFilename());
 
             return ResponseEntity.ok("added 4 verifiation");
 
@@ -165,29 +127,6 @@ public class AzatController {
     }
 
 
-//    @PostMapping("/admin")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
-//    public ResponseEntity<String> adminPannel(@RequestParam("name") String name, @RequestParam("verified") boolean verified) {
-//        byte[] array = redisRepository.getData(name).getBytes(StandardCharsets.UTF_8);
-//        if (array != null && array.length != 0) {
-//
-//            if (verified) {
-//
-//
-//                String fileName = picturesHolder.getMultiPartName(name);
-//
-//                fileService.createFile(fileName, array);
-//                return ResponseEntity.ok("successfully added!");
-//            }
-//
-//            picturesHolder.remove(name);
-//            redisRepository.remove(name);
-//
-//
-//        }
-//
-//        return ResponseEntity.badRequest().body("No such image");
-//    }
 
 
 }

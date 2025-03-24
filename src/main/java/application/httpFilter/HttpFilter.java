@@ -18,9 +18,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.util.logging.Logger;
 
 @EnableWebSecurity
-@EnableMethodSecurity
 @Configuration
 public class HttpFilter {
+
+
+    @Autowired
+    private AdminFilter adminFilter;
 
 
     @Bean
@@ -29,7 +32,10 @@ public class HttpFilter {
                .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-               .authorizeHttpRequests(request -> request.anyRequest().permitAll());
+               .authorizeHttpRequests(request -> request.anyRequest().permitAll())
+
+               .addFilterBefore(adminFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
