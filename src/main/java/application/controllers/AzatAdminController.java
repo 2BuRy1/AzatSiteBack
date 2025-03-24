@@ -33,7 +33,7 @@ public class AzatAdminController {
     }
 
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/getAllImages")
     public ResponseEntity<HashMap<String, ArrayList<ImageDTO>>> getAllPictures(Principal principal) {
         System.out.println(SecurityContextHolder.getContext().getAuthentication());

@@ -40,13 +40,6 @@ public class AdminFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = request.getParameter("token");
         System.out.println(SecurityContextHolder.getContext().getAuthentication());
-        if (SecurityContextHolder.getContext().getAuthentication() != null){
-
-
-            filterChain.doFilter(request, response);
-
-
-        }
         if (token != null) {
             String username = jwtConfiguration.extractUsername(token);
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

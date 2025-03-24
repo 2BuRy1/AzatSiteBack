@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.util.logging.Logger;
 
 @EnableWebSecurity
+@EnableMethodSecurity
 @Configuration
 public class HttpFilter {
 
