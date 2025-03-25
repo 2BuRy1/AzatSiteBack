@@ -29,20 +29,8 @@ public class PicturesHolder {
 
 
 
-    public void addPictureToCash(String name, String fullMultipartName){
-        picturesCash.put(name, fullMultipartName);
-    }
 
 
-    public byte[] getByNameFromCash(String name) throws IOException {
-
-        File file = fileService.getFileByName(picturesCash.get(name));
-        return Files.readAllBytes(file.toPath());
-    }
-
-    public String getMultiPartName(String name){
-        return picturesCash.get(name);
-    }
 
     public void remove(String name){
         picturesCash.remove(name);

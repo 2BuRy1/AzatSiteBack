@@ -1,15 +1,17 @@
 package application.controllers;
 
+import application.dto.ApprovementDTO;
 import application.dto.ImageDTO;
+import application.picturesContainer.PicturesHolder;
 import application.repository.RedisRepository;
+import application.services.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -26,17 +28,40 @@ public class AzatAdminController {
 
     private final Logger logger;
 
+    private final FileService fileService;
+
+    private final PicturesHolder picturesHolder;
+
     @Autowired
-    public AzatAdminController(RedisRepository redisRepository, Logger logger) {
+    public AzatAdminController(RedisRepository redisRepository, Logger logger, FileService fileService, PicturesHolder picturesHolder) {
         this.redisRepository = redisRepository;
         this.logger = logger;
+        this.fileService = fileService;
+        this.picturesHolder = picturesHolder;
     }
 
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/approve")
+    public ResponseEntity<String> approveImage(@RequestBody ApprovementDTO approvementDTO){
+
+        String imageName = approvementDTO.getName();
+
+        if(approvementDTO.isStatus()){
+            fileService.createFile(imageName + ".png", redisRepository.getData(approvementDTO.getName()));
+            redisRepository.remove(approvementDTO.getName());
+            picturesHolder.addToPictures(imageName, imageName + ".png");
+        }
+        redisRepository.remove(approvementDTO.getName());
+        return ResponseEntity.status(200).body("Ну чета закинули");
+    }
+
+
+
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getAllImages")
     public ResponseEntity<HashMap<String, ArrayList<ImageDTO>>> getAllPictures(Principal principal) {
-        System.out.println(SecurityContextHolder.getContext().getAuthentication());
         ArrayList<String> keys = (ArrayList<String>) redisRepository.getAllKeys();
         ArrayList<ImageDTO> images = new ArrayList<>();
 

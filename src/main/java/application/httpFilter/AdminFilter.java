@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 @Component
@@ -39,19 +40,20 @@ public class AdminFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = request.getParameter("token");
-        System.out.println(SecurityContextHolder.getContext().getAuthentication());
-        if (token != null) {
-            String username = jwtConfiguration.extractUsername(token);
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                var user = userDetailsManager.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-                httpSessionSecurityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+            if (token != null) {
+                String username = jwtConfiguration.extractUsername(token);
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    var user = userDetailsManager.loadUserByUsername(username);
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                    httpSessionSecurityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
 
+                    response.sendRedirect("http://localhost:5173/admin");
 
+                }
             }
+            filterChain.doFilter(request, response);
         }
-        filterChain.doFilter(request, response);
-    }
+
 }
 

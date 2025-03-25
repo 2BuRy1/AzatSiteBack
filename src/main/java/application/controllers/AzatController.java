@@ -77,7 +77,7 @@ public class AzatController {
 
             redisRepository.saveImage(name, multipartFile.getBytes(), 12);
 
-            picturesHolder.addPictureToCash(name, multipartFile.getOriginalFilename());
+           // picturesHolder.addPictureToCash(name, multipartFile.getOriginalFilename());
 
             fileService.createFile(multipartFile.getOriginalFilename(), multipartFile.getBytes());
 
@@ -88,13 +88,12 @@ public class AzatController {
                                     "<body>" +
                                     "<h2>Новая фотография была добавлена!</h2>" +
                                     "<p>Для подтверждения добавления фотографии, пожалуйста, перейдите по ссылке ниже:</p>" +
-                                    "<a href=\"http://localhost:5173/admin?token=%s\">Перейти для подтверждения</a>" +
+                                    "<a href=\"http://localhost:8089/admin?token=%s\">Перейти для подтверждения</a>" +
                                     "</body>" +
                                     "</html>",
                             jwtConfiguration.generateToken(username)),
                     fileService.getFileByName(multipartFile.getOriginalFilename())
             );
-            //TODO нагенерить токен + вставить его в ссылочку
               fileService.removeFileByName(multipartFile.getOriginalFilename());
 
             return ResponseEntity.ok("added 4 verifiation");
@@ -108,7 +107,7 @@ public class AzatController {
 
     @GetMapping("/name")
     public ResponseEntity<?> getImage(@RequestParam("data") String name) throws IOException {
-        String filePath = "uploads/" + picturesHolder.getMultiPartName(name);
+        String filePath = "uploads/" + picturesHolder.getPictureByName(name);
         File file = new File(filePath);
 
         if (!file.exists()) {
