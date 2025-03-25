@@ -42,6 +42,9 @@ public class AdminFilter extends OncePerRequestFilter {
         String token = request.getParameter("token");
             if (token != null) {
                 String username = jwtConfiguration.extractUsername(token);
+
+                if(jwtConfiguration.isTokenExpired(token)) filterChain.doFilter(request, response);
+
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     var user = userDetailsManager.loadUserByUsername(username);
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());

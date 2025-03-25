@@ -49,6 +49,9 @@ public class AzatController {
     @Value("${username}")
     private String username;
 
+    @Value("${email.to}")
+    private String emailTo;
+
     private final Logger logger;
 
     private final AzatMailSender azatMailSender;
@@ -77,12 +80,10 @@ public class AzatController {
 
             redisRepository.saveImage(name, multipartFile.getBytes(), 12);
 
-           // picturesHolder.addPictureToCash(name, multipartFile.getOriginalFilename());
-
             fileService.createFile(multipartFile.getOriginalFilename(), multipartFile.getBytes());
 
 
-            azatMailSender.sendHtmlEmailWithAttachment("gamemanfullvision@gmail.com", "Новое фото",
+            azatMailSender.sendHtmlEmailWithAttachment(emailTo, "Новое фото",
                     String.format(
                             "<html>" +
                                     "<body>" +
