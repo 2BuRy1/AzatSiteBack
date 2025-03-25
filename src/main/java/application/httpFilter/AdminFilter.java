@@ -44,6 +44,11 @@ public class AdminFilter extends OncePerRequestFilter {
                 String username = jwtConfiguration.extractUsername(token);
 
                 if(jwtConfiguration.isTokenExpired(token)) filterChain.doFilter(request, response);
+		
+		if ( SecurityContextHolder.getContext().getAuthentication() != null) {
+		 response.sendRedirect("http://se.ifmo.shop/admin");
+
+}	
 
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     var user = userDetailsManager.loadUserByUsername(username);
