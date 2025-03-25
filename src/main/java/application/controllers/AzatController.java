@@ -89,7 +89,7 @@ public class AzatController {
                                     "<body>" +
                                     "<h2>Новая фотография была добавлена!</h2>" +
                                     "<p>Для подтверждения добавления фотографии, пожалуйста, перейдите по ссылке ниже:</p>" +
-                                    "<a href=\"http://localhost:8089/admin?token=%s\">Перейти для подтверждения</a>" +
+                                    "<a href=\"http://se.ifmo.shop:8089/admin?token=%s\">Перейти для подтверждения</a>" +
                                     "</body>" +
                                     "</html>",
                             jwtConfiguration.generateToken(username)),

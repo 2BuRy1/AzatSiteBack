@@ -47,6 +47,18 @@ public class PicturesHolder {
     public void init(){
 
       Path path = Paths.get("uploads/");
+	
+	if (!Files.exists(path)) {
+        try {
+            // Пытаемся создать директорию, если её нет
+            Files.createDirectories(path);
+            System.out.println("Директория uploads создана");
+        } catch (IOException e) {
+            System.out.println("Не удалось создать директорию uploads: " + e.getMessage());
+            return; // Выходим из метода, если не смогли создать
+        }
+    }
+
 
         try {
             Files.walk(path).
@@ -59,7 +71,7 @@ public class PicturesHolder {
 
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Директория не найднеа");
         }
 
 

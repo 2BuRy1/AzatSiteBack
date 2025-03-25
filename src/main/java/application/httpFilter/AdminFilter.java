@@ -51,7 +51,7 @@ public class AdminFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                     httpSessionSecurityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
 
-                    response.sendRedirect("http://localhost:5173/admin");
+                    response.sendRedirect("http://se.ifmo.shop/admin");
 
                 }
             }
