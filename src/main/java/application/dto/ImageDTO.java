@@ -1,16 +1,32 @@
 package application.dto;
 
 
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
+import java.awt.*;
 import java.util.Arrays;
 
 
 @Data
+@Entity
 public class ImageDTO {
 
-    private final String name;
 
-    private final byte[] image;
+    public ImageDTO(){}
+
+    public ImageDTO(String name, byte[] image){
+        this.name = name;
+        this.image = image;
+    }
+
+    private String name;
+
+    private byte[] image;
+    @Getter
+    @Setter
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
 
 }

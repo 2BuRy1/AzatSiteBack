@@ -3,6 +3,7 @@ package application.controllers;
 import application.dto.ApprovementDTO;
 import application.dto.ImageDTO;
 import application.picturesContainer.PicturesHolder;
+import application.repository.ImageRepository;
 import application.repository.RedisRepository;
 import application.services.FileService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,12 +33,15 @@ public class AzatAdminController {
 
     private final PicturesHolder picturesHolder;
 
+    private final ImageRepository imageRepository;
+
     @Autowired
-    public AzatAdminController(RedisRepository redisRepository, Logger logger, FileService fileService, PicturesHolder picturesHolder) {
+    public AzatAdminController(RedisRepository redisRepository, Logger logger, FileService fileService, PicturesHolder picturesHolder, ImageRepository imageRepository) {
         this.redisRepository = redisRepository;
         this.logger = logger;
         this.fileService = fileService;
         this.picturesHolder = picturesHolder;
+        this.imageRepository = imageRepository;
     }
 
 
@@ -48,6 +52,7 @@ public class AzatAdminController {
         String imageName = approvementDTO.getName();
 
         if(approvementDTO.isStatus()){
+            imageRepository.save(new ImageDTO(imageName, redisRepository.getData(approvementDTO.getName())));
             fileService.createFile(imageName + ".png", redisRepository.getData(approvementDTO.getName()));
             redisRepository.remove(approvementDTO.getName());
             picturesHolder.addToPictures(imageName, imageName + ".png");
@@ -61,7 +66,7 @@ public class AzatAdminController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getAllImages")
-    public ResponseEntity<HashMap<String, ArrayList<ImageDTO>>> getAllPictures(Principal principal) {
+    public ResponseEntity<HashMap<String, ArrayList<ImageDTO>>> getAllPictures() {
         ArrayList<String> keys = (ArrayList<String>) redisRepository.getAllKeys();
         ArrayList<ImageDTO> images = new ArrayList<>();
 

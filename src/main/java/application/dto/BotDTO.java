@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class BotDTO {
 
-
     @Value("${bot.name}")
     private String botName;
 
 
     @Value("${bot.token}")
     private String botToken;
+
 
 }

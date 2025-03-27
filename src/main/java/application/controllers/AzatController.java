@@ -1,7 +1,9 @@
 package application.controllers;
 
 
+import application.dto.ImageDTO;
 import application.picturesContainer.PicturesHolder;
+import application.repository.ImageRepository;
 import application.services.AzatMailSender;
 import application.repository.RedisRepository;
 import application.services.FileService;
@@ -31,6 +33,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 @RestController
@@ -60,14 +63,18 @@ public class AzatController {
 
     private final FileService fileService;
 
+    private final ImageRepository imageRepository;
+
+
     @Autowired
-    public AzatController(PicturesHolder picturesHolder, RedisRepository redisRepository, Logger logger, AzatMailSender azatMailSender, JwtConfiguration jwtConfiguration, FileService fileService) {
+    public AzatController(PicturesHolder picturesHolder, RedisRepository redisRepository, Logger logger, AzatMailSender azatMailSender, JwtConfiguration jwtConfiguration, FileService fileService, ImageRepository imageRepository) {
         this.picturesHolder = picturesHolder;
         this.redisRepository = redisRepository;
         this.logger = logger;
         this.azatMailSender = azatMailSender;
         this.jwtConfiguration = jwtConfiguration;
         this.fileService = fileService;
+        this.imageRepository = imageRepository;
     }
 
 
@@ -107,21 +114,19 @@ public class AzatController {
 
 
     @GetMapping("/name")
-    public ResponseEntity<?> getImage(@RequestParam("data") String name) throws IOException {
-        String filePath = "uploads/" + picturesHolder.getPictureByName(name);
-        File file = new File(filePath);
-
-        if (!file.exists()) {
+    public ResponseEntity<?> getImage(@RequestParam("name") String name) throws IOException {
+        Optional<ImageDTO> imageDTO = imageRepository.getImageDTOByName(name);
+        if (imageDTO.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(Collections.singletonMap("error", "No such image"));
         }
 
-        byte[] fileBytes = Files.readAllBytes(file.toPath());
+        byte[] fileBytes = imageDTO.get().getImage();
         ByteArrayResource resource = new ByteArrayResource(fileBytes);
 
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG) // Или IMAGE_PNG
+                .contentType(MediaType.IMAGE_JPEG)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + name + "\"")
                 .body(resource);
     }
