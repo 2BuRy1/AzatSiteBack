@@ -1,6 +1,9 @@
 package application.services;
 
 import application.dto.BotDTO;
+import application.models.Command;
+import application.models.GetImages;
+import lombok.SneakyThrows;
 import org.jvnet.hk2.annotations.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,20 +12,33 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.awt.*;
+import java.util.Optional;
+
 @Component
 public class BotService extends TelegramLongPollingBot {
 
 
+    @Autowired
+    private CommandResolver commandResolver;
+
+    @Autowired
+    private ImageRepository imageRepository;
 
     @Autowired
     private BotDTO botDTO;
 
+    @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
         if(update.getMessage().hasText()){
-
-            send(update.getMessage().getChatId(), "Привет, %s".formatted(update.getMessage().getChat().getFirstName()));
-
+            Optional<Command> command = commandResolver.resolve(update.getMessage().getText());
+            if (command.isPresent()){
+                if(command.get().getClass().isInstance(GetImages.class)) command.get().setRepository(imageRepository);
+                var result = command.get().execute();
+                System.out.println(result);
+                send(update.getMessage().getChatId(), result);
+            }
         }
     }
 
