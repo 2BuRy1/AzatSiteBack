@@ -4,6 +4,7 @@ import application.dto.ImageDTO;
 import application.repository.ImageRepository;
 import lombok.Data;
 import lombok.Getter;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.awt.*;
 
@@ -22,5 +23,5 @@ public abstract class Command {
     }
 
 
-    public abstract String execute();
+    public abstract String execute(Message message);
 }

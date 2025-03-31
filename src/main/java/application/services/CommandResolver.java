@@ -29,7 +29,8 @@ public class CommandResolver {
         Set<Class<? extends Command>> subClasses = reflections.getSubTypesOf(Command.class);
         for (var e : subClasses) {
             Method method = e.getMethod("getName");
-            if (method.invoke(e.newInstance()).equals(name)) return Optional.of(e.newInstance());
+            System.out.println(name.strip());
+            if (method.invoke(e.newInstance()).toString().equals(name.split(" ")[0])) return Optional.of(e.newInstance());
         }
         return Optional.empty();
     }

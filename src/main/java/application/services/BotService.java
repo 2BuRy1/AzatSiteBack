@@ -37,8 +37,7 @@ public class BotService extends TelegramLongPollingBot {
             if (command.isPresent()){
                 Command execCommand = command.get();
                 if(execCommand instanceof GetImages) command.get().setImageRepository(imageRepository);
-                var result = command.get().execute();
-                System.out.println(result);
+                var result = command.get().execute(update.getMessage());
                 send(update.getMessage().getChatId(), result);
             }
         }
