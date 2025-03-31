@@ -3,6 +3,7 @@ package application.services;
 import application.dto.BotDTO;
 import application.models.Command;
 import application.models.GetImages;
+import application.repository.ImageRepository;
 import lombok.SneakyThrows;
 import org.jvnet.hk2.annotations.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,8 @@ public class BotService extends TelegramLongPollingBot {
         if(update.getMessage().hasText()){
             Optional<Command> command = commandResolver.resolve(update.getMessage().getText());
             if (command.isPresent()){
-                if(command.get().getClass().isInstance(GetImages.class)) command.get().setRepository(imageRepository);
+                Command execCommand = command.get();
+                if(execCommand instanceof GetImages) command.get().setImageRepository(imageRepository);
                 var result = command.get().execute();
                 System.out.println(result);
                 send(update.getMessage().getChatId(), result);

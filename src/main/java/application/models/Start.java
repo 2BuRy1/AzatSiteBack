@@ -9,4 +9,6 @@ public class Start extends Command{
     public String execute() {
         return "Добро пожаловать в азат-бота! Чтобы получить сводку по командам: напиши /help";
     }
+
 }
+

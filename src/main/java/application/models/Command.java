@@ -1,26 +1,26 @@
 package application.models;
 
 import application.dto.ImageDTO;
+import application.repository.ImageRepository;
 import lombok.Data;
 import lombok.Getter;
+
+import java.awt.*;
+
 @Data
 public abstract class Command {
 
+    protected ImageRepository imageRepository;
 
-    private final String name;
+    protected final String name;
 
-    private final String description;
-
-    private String result;
+    protected final String description;
 
     public Command(String name, String description){
         this.name = name;
         this.description = description;
     }
 
-    public void setRepository(ImageDTO imageDTO) {
-
-    }
 
     public abstract String execute();
 }

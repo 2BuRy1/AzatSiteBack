@@ -15,10 +15,10 @@ public class BotConfiguration {
 
 
 
-//    @Bean
-//    public TelegramBotsApi telegramBotsApi(BotService botService) throws TelegramApiException {
-//        var api = new TelegramBotsApi(DefaultBotSession.class);
-//        api.registerBot(botService);
-//        return api;
-//    }
+    @Bean
+    public TelegramBotsApi telegramBotsApi(BotService botService) throws TelegramApiException {
+        var api = new TelegramBotsApi(DefaultBotSession.class);
+        api.registerBot(botService);
+        return api;
+    }
 }
