@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 
 @Component
@@ -29,11 +30,19 @@ public class BotService extends TelegramLongPollingBot {
     @Autowired
     private BotDTO botDTO;
 
-    @SneakyThrows
+    @Autowired
+    AzatMailSender azatMailSender;
+
     @Override
     public void onUpdateReceived(Update update) {
         if(update.getMessage().hasText()){
-            Optional<Command> command = commandResolver.resolve(update.getMessage().getText());
+            Optional<Command> command = null;
+            try {
+                command = commandResolver.resolve(update.getMessage().getText());
+            } catch (InstantiationException | IllegalAccessException | NoSuchFieldException | NoSuchMethodException |
+                     InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
             if (command.isPresent()){
                 Command execCommand = command.get();
                 if(execCommand instanceof GetImages) command.get().setImageRepository(imageRepository);

@@ -2,7 +2,6 @@ package application.controllers;
 
 import application.dto.ApprovementDTO;
 import application.dto.ImageDTO;
-import application.picturesContainer.PicturesHolder;
 import application.repository.ImageRepository;
 import application.repository.RedisRepository;
 import application.services.FileService;
@@ -31,16 +30,14 @@ public class AzatAdminController {
 
     private final FileService fileService;
 
-    private final PicturesHolder picturesHolder;
 
     private final ImageRepository imageRepository;
 
     @Autowired
-    public AzatAdminController(RedisRepository redisRepository, Logger logger, FileService fileService, PicturesHolder picturesHolder, ImageRepository imageRepository) {
+    public AzatAdminController(RedisRepository redisRepository, Logger logger, FileService fileService, ImageRepository imageRepository) {
         this.redisRepository = redisRepository;
         this.logger = logger;
         this.fileService = fileService;
-        this.picturesHolder = picturesHolder;
         this.imageRepository = imageRepository;
     }
 
@@ -55,7 +52,6 @@ public class AzatAdminController {
             imageRepository.save(new ImageDTO(imageName, redisRepository.getData(approvementDTO.getName())));
             fileService.createFile(imageName + ".png", redisRepository.getData(approvementDTO.getName()));
             redisRepository.remove(approvementDTO.getName());
-            picturesHolder.addToPictures(imageName, imageName + ".png");
         }
         redisRepository.remove(approvementDTO.getName());
         return ResponseEntity.status(200).body("Ну чета закинули");

@@ -12,6 +12,19 @@ services:
       - redis_data:/data
     command: redis-server --appendonly yes
 
+
+  database:
+      image: postgres:latest
+      ports:
+        - "5432:5432"
+      environment:
+        - POSTGRES_DB=data
+        - POSTGRES_USER=user
+        - POSTGRES_PASSWORD=passwd
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
 volumes:
   redis_data:
+    driver: local
+  postgres_data:
     driver: local
