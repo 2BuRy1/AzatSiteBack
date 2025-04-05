@@ -7,7 +7,7 @@ public class GetImages extends Command{
 
 
     public GetImages() {
-        super("/getImages", "returns all available image names ");
+        super("/images", "returns all image names ");
     }
 
 

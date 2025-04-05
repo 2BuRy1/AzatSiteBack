@@ -114,7 +114,7 @@ public class AzatController {
 
 
     @GetMapping("/name")
-    public ResponseEntity<?> getImage(@RequestParam("name") String name) throws IOException {
+    public ResponseEntity<?> getImage(@RequestParam("data") String name) throws IOException {
         Optional<ImageDTO> imageDTO = imageRepository.getImageDTOByName(name);
         if (imageDTO.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
