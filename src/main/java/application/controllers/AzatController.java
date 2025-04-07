@@ -68,9 +68,9 @@ public class AzatController {
 
 
 
-        if (redisRepository.getData(name) == null) {
+        if (redisRepository.getData(name) == null && imageRepository.getImageDTOByName(name).isEmpty()) {
 
-            redisRepository.saveImage(name, multipartFile.getBytes(), 12);
+            redisRepository.saveImage(name, multipartFile.getBytes(), 48);
 
             fileService.createFile(multipartFile.getOriginalFilename(), multipartFile.getBytes());
 
@@ -87,7 +87,6 @@ public class AzatController {
                             jwtConfiguration.generateToken(username)),
                     fileService.getFileByName(multipartFile.getOriginalFilename())
             );
-           //   fileService.removeFileByName(multipartFile.getOriginalFilename());
 
             return ResponseEntity.ok("added 4 verifiation");
 
