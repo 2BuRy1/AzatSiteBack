@@ -19,4 +19,4 @@
 
 ### Доступ к сайту можно получить по ссылке: 
 
-### [Azat Site🥸😤](http://se.ifmo.shop)
+### [Azat Site🥸😤](http://se.ifmo.shop:8081)
